@@ -10,4 +10,13 @@ class MessageController extends Controller
         $messages = Message::with(['user'])->get();
         return response()->json($messages);
     }
+
+    public function store(Request $request)
+    {
+        $message = $request->user()->messages()->create([
+            'body' => $request->body
+        ]);
+
+        return response()->json($message);
+    }
 }

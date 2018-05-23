@@ -47966,6 +47966,11 @@ exports.push([module.i, "\n.message-area {\n    height: 400px;\n    max-height: 
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__event_js__ = __webpack_require__(70);
+//
+//
+//
+//
 //
 //
 //
@@ -47973,9 +47978,26 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
+    data: function data() {
+        return {
+            messages: []
+        };
+    },
     mounted: function mounted() {
-        console.log('Component mounted.');
+        var _this = this;
+
+        axios.get('/message').then(function (response) {
+            console.log(response.data);
+            _this.messages = response.data;
+        });
+        __WEBPACK_IMPORTED_MODULE_0__event_js__["a" /* default */].$on('added_message', function (message) {
+            _this.messages.unshift(message);
+            if (message.selfMessage) {
+                _this.$refs.message.scrollTop = 0;
+            }
+        });
     }
 });
 
@@ -47989,9 +48011,13 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c(
     "div",
-    { staticClass: "message-area" },
-    [_c("message-component")],
-    1
+    { ref: "message", staticClass: "message-area" },
+    _vm._l(_vm.messages, function(message) {
+      return _c("message-component", {
+        key: message.id,
+        attrs: { message: message }
+      })
+    })
   )
 }
 var staticRenderFns = []
@@ -48101,6 +48127,10 @@ exports.push([module.i, "\n.form {\n    padding: 8px;\n}\n.form-input {\n    wid
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__event_js__ = __webpack_require__(70);
+//
+//
+//
 //
 //
 //
@@ -48117,9 +48147,39 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-    mounted: function mounted() {
-        console.log('Component mounted.');
+    data: function data() {
+        return {
+            body: null
+        };
+    },
+
+    methods: {
+        typing: function typing(e) {
+            if (e.keyCode === 13 && !e.shiftKey) {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        },
+        sendMessage: function sendMessage() {
+            if (!this.body || this.body.trim() === '') {
+                return;
+            }
+            var messageObj = this.buildMessage();
+            __WEBPACK_IMPORTED_MODULE_0__event_js__["a" /* default */].$emit('added_message', messageObj);
+            this.body = null;
+        },
+        buildMessage: function buildMessage() {
+            return {
+                id: Date.now(),
+                body: this.body,
+                selfMessage: true,
+                user: {
+                    name: Laravel.user.name
+                }
+            };
+        }
     }
 });
 
@@ -48131,27 +48191,38 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
-}
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", [
-      _c("form", { staticClass: "form" }, [
-        _c("textarea", {
-          staticClass: "form-input",
-          attrs: { cols: "25", rows: "5" }
-        }),
-        _vm._v(" "),
-        _c("span", { staticClass: "notice" }, [
-          _vm._v("\n            Hit return to send a message\n        ")
-        ])
+  return _c("div", [
+    _c("form", { staticClass: "form" }, [
+      _c("textarea", {
+        directives: [
+          {
+            name: "model",
+            rawName: "v-model",
+            value: _vm.body,
+            expression: "body"
+          }
+        ],
+        staticClass: "form-input",
+        attrs: { id: "body", cols: "28", rows: "5" },
+        domProps: { value: _vm.body },
+        on: {
+          keydown: _vm.typing,
+          input: function($event) {
+            if ($event.target.composing) {
+              return
+            }
+            _vm.body = $event.target.value
+          }
+        }
+      }),
+      _vm._v(" "),
+      _c("span", { staticClass: "notice" }, [
+        _vm._v("\n            Hit Return to send a message\n        ")
       ])
     ])
-  }
-]
+  ])
+}
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -48267,9 +48338,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-    mounted: function mounted() {
-        console.log('Component mounted.');
-    }
+    props: ['message']
 });
 
 /***/ }),
@@ -48280,24 +48349,15 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _vm._m(0)
+  return _c("div", { staticClass: "message self" }, [
+    _c("strong", { staticClass: "user" }, [
+      _vm._v(_vm._s(_vm.message.user.name))
+    ]),
+    _vm._v(" "),
+    _c("p", { staticClass: "body" }, [_vm._v(_vm._s(_vm.message.body))])
+  ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "message self" }, [
-      _c("strong", { staticClass: "user" }, [_vm._v("Krunal")]),
-      _vm._v(" "),
-      _c("p", { staticClass: "body" }, [
-        _vm._v(
-          "Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam cumque quaerat rem quia veniam exercitationem, commodi numquam omnis! Non placeat perspiciatis nulla illum cumque ad natus asperiores fuga. Facere, dignissimos."
-        )
-      ])
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 module.exports = { render: render, staticRenderFns: staticRenderFns }
 if (false) {
@@ -48312,6 +48372,20 @@ if (false) {
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 67 */,
+/* 68 */,
+/* 69 */,
+/* 70 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue__ = __webpack_require__(39);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_vue__);
+
+
+/* harmony default export */ __webpack_exports__["a"] = (new __WEBPACK_IMPORTED_MODULE_0_vue___default.a());
 
 /***/ })
 /******/ ]);

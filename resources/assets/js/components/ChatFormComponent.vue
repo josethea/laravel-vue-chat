@@ -1,24 +1,56 @@
 <template>
     <div>
         <form class="form">
-            <textarea 
-                cols="25" 
-                rows="5" 
-                class="form-input">
+            <textarea
+                id="body"
+                cols="28"
+                rows="5"
+                class="form-input"
+                @keydown="typing"
+                v-model="body">
             </textarea>
             <span class="notice">
-                Hit return to send a message
+                Hit Return to send a message
             </span>
         </form>
     </div>
 </template>
 
 <script>
-export default {
-    mounted() {
-        console.log('Component mounted.');
+    import Event from '../event.js';
+    export default {
+        data() {
+            return {
+                body: null
+            }
+        },
+        methods: {
+            typing(e) {
+                if(e.keyCode === 13 && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }        
+            },
+            sendMessage() {
+                if(!this.body || this.body.trim() === '') {
+                    return
+                }
+                let messageObj = this.buildMessage();
+                Event.$emit('added_message', messageObj);
+                this.body = null;
+            },
+            buildMessage() {
+                return {
+                    id: Date.now(),
+                    body: this.body,
+                    selfMessage: true,
+                    user: {
+                        name: Laravel.user.name
+                    }
+                }
+            }
+        }
     }
-}
 </script>
 <style>
     .form {
