@@ -1,5 +1,5 @@
 <template>
-    <div class="message self">
+    <div class="message" :class="{ 'self': message.selfMessage }">
         <strong class="user">{{ message.user.name }}</strong>
         <p class="body">{{ message.body }}</p>
     </div>

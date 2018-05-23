@@ -37,6 +37,11 @@
                 }
                 let messageObj = this.buildMessage();
                 Event.$emit('added_message', messageObj);
+                axios.post('/message', {
+                    body: this.body.trim()
+                }).catch(() => {
+                    console.log('failed');
+                });
                 this.body = null;
             },
             buildMessage() {
